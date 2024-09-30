@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import org.jsmpp.bean.AlertNotification;
 import org.jsmpp.bean.DeliverSm;
+import org.jsmpp.bean.SubmitSm;
 import org.jsmpp.extra.ProcessRequestException;
 
 /**
@@ -55,4 +56,13 @@ public interface ResponseHandler extends BaseResponseHandler {
      * @param alertNotification the alert_notification object
      */
     void processAlertNotification(AlertNotification alertNotification);
+
+    /**
+     * Response by sending <b>Submit SM</b> to SMSC.
+     *
+     * @param submitSm the submitSm object
+     */
+    SubmitSmResult processSubmitSm(SubmitSm submitSm) throws ProcessRequestException;
+
+    void sendSubmitSmResponse(SubmitSmResult submitSmResult, int sequenceNumber) throws IOException;
 }

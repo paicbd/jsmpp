@@ -49,6 +49,7 @@ public class SubmitSmCommandTask extends AbstractSendCommandTask {
     private final DataCoding dataCoding;
     private final byte smDefaultMsgId;
     private final byte[] shortMessage;
+    private final int sequenceNumber;
     private final OptionalParameter[] optionalParameters;
     
     public SubmitSmCommandTask(PDUSender pduSender, String serviceType,
@@ -79,6 +80,41 @@ public class SubmitSmCommandTask extends AbstractSendCommandTask {
         this.dataCoding = dataCoding;
         this.smDefaultMsgId = smDefaultMsgId;
         this.shortMessage = shortMessage;
+        this.optionalParameters = optionalParameters;
+        this.sequenceNumber = 0;
+    }
+
+
+    public SubmitSmCommandTask(PDUSender pduSender, String serviceType,
+                               TypeOfNumber sourceAddrTon, NumberingPlanIndicator sourceAddrNpi,
+                               String sourceAddr, TypeOfNumber destAddrTon,
+                               NumberingPlanIndicator destAddrNpi, String destinationAddr,
+                               ESMClass esmClass, byte protocolId, byte priorityFlag,
+                               String scheduleDeliveryTime, String validityPeriod,
+                               RegisteredDelivery registeredDelivery, byte replaceIfPresentFlag,
+                               DataCoding dataCoding, byte smDefaultMsgId, byte[] shortMessage,
+                               int sequenceNumber,
+                               OptionalParameter... optionalParameters) {
+
+        super(pduSender);
+        this.serviceType = serviceType;
+        this.sourceAddrTon = sourceAddrTon;
+        this.sourceAddrNpi = sourceAddrNpi;
+        this.sourceAddr = sourceAddr;
+        this.destAddrTon = destAddrTon;
+        this.destAddrNpi = destAddrNpi;
+        this.destinationAddr = destinationAddr;
+        this.esmClass = esmClass;
+        this.protocolId = protocolId;
+        this.priorityFlag = priorityFlag;
+        this.scheduleDeliveryTime = scheduleDeliveryTime;
+        this.validityPeriod = validityPeriod;
+        this.registeredDelivery = registeredDelivery;
+        this.replaceIfPresentFlag = replaceIfPresentFlag;
+        this.dataCoding = dataCoding;
+        this.smDefaultMsgId = smDefaultMsgId;
+        this.shortMessage = shortMessage;
+        this.sequenceNumber = sequenceNumber;
         this.optionalParameters = optionalParameters;
     }
 

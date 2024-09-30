@@ -52,6 +52,7 @@ import org.jsmpp.bean.QuerySmResp;
 import org.jsmpp.bean.RegisteredDelivery;
 import org.jsmpp.bean.ReplaceIfPresentFlag;
 import org.jsmpp.bean.SubmitMultiResp;
+import org.jsmpp.bean.SubmitSm;
 import org.jsmpp.bean.SubmitSmResp;
 import org.jsmpp.bean.TypeOfNumber;
 import org.jsmpp.extra.NegativeResponseException;
@@ -92,9 +93,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author uudashr
  */
-public class SMPPSession extends AbstractSession implements ClientSession {
+public class SMPPSession extends AbstractSession implements ClientSession, ServerSession {
   private static final Logger log = LoggerFactory.getLogger(SMPPSession.class);
   private static final String MESSAGE_RECEIVER_LISTENER_IS_NULL = "Received {} but message receiver listener is null";
+  private static final String NO_MESSAGE_RECEIVER_LISTENER_REGISTERED = "No message receiver listener registered";
 
   /* Utility */
   private final PDUReader pduReader;
@@ -366,18 +368,54 @@ public class SMPPSession extends AbstractSession implements ClientSession {
       ResponseTimeoutException, InvalidResponseException,
       NegativeResponseException, IOException {
 
+    return createShortMessage(serviceType, sourceAddrTon, sourceAddrNpi, sourceAddr, destAddrTon, destAddrNpi, destinationAddr, esmClass, protocolId, priorityFlag, scheduleDeliveryTime, validityPeriod, registeredDelivery, replaceIfPresentFlag,
+            dataCoding, smDefaultMsgId, shortMessage, 0, optionalParameters);
+  }
+
+  public SubmitSmResult submitShortMessage(String serviceType,
+                                           TypeOfNumber sourceAddrTon, NumberingPlanIndicator sourceAddrNpi,
+                                           String sourceAddr, TypeOfNumber destAddrTon,
+                                           NumberingPlanIndicator destAddrNpi, String destinationAddr,
+                                           ESMClass esmClass, byte protocolId, byte priorityFlag,
+                                           String scheduleDeliveryTime, String validityPeriod,
+                                           RegisteredDelivery registeredDelivery, byte replaceIfPresentFlag,
+                                           DataCoding dataCoding, byte smDefaultMsgId, byte[] shortMessage,
+                                           int sequenceNumber,
+                                           OptionalParameter... optionalParameters) throws PDUException,
+          ResponseTimeoutException, InvalidResponseException,
+          NegativeResponseException, IOException {
+
+      return createShortMessage(serviceType, sourceAddrTon, sourceAddrNpi, sourceAddr, destAddrTon, destAddrNpi, destinationAddr, esmClass, protocolId, priorityFlag, scheduleDeliveryTime, validityPeriod, registeredDelivery, replaceIfPresentFlag,
+              dataCoding, smDefaultMsgId, shortMessage, sequenceNumber, optionalParameters);
+  }
+
+  public SubmitSmResult createShortMessage(String serviceType,
+                                           TypeOfNumber sourceAddrTon, NumberingPlanIndicator sourceAddrNpi,
+                                           String sourceAddr, TypeOfNumber destAddrTon,
+                                           NumberingPlanIndicator destAddrNpi, String destinationAddr,
+                                           ESMClass esmClass, byte protocolId, byte priorityFlag,
+                                           String scheduleDeliveryTime, String validityPeriod,
+                                           RegisteredDelivery registeredDelivery, byte replaceIfPresentFlag,
+                                           DataCoding dataCoding, byte smDefaultMsgId, byte[] shortMessage,
+                                           int sequenceNumber,
+                                           OptionalParameter... optionalParameters) throws PDUException,
+          ResponseTimeoutException, InvalidResponseException,
+          NegativeResponseException, IOException {
+
     ensureTransmittable(SubmitSmCommandTask.COMMAND_NAME_SUBMIT_SM);
 
     SubmitSmCommandTask submitSmTask = new SubmitSmCommandTask(
-        pduSender(), serviceType, sourceAddrTon, sourceAddrNpi,
-        sourceAddr, destAddrTon, destAddrNpi, destinationAddr,
-        esmClass, protocolId, priorityFlag, scheduleDeliveryTime,
-        validityPeriod, registeredDelivery, replaceIfPresentFlag,
-        dataCoding, smDefaultMsgId, shortMessage, optionalParameters);
+            pduSender(), serviceType, sourceAddrTon, sourceAddrNpi,
+            sourceAddr, destAddrTon, destAddrNpi, destinationAddr,
+            esmClass, protocolId, priorityFlag, scheduleDeliveryTime,
+            validityPeriod, registeredDelivery, replaceIfPresentFlag,
+            dataCoding, smDefaultMsgId, shortMessage, optionalParameters);
 
-    SubmitSmResp resp = (SubmitSmResp) executeSendCommand(submitSmTask, getTransactionTimer());
+    SubmitSmResp resp = sequenceNumber == 0 ? (SubmitSmResp) executeSendCommand(submitSmTask, getTransactionTimer()):
+    (SubmitSmResp) executeSendCommand(submitSmTask, getTransactionTimer(), sequenceNumber);
 
     return new SubmitSmResult(resp.getMessageId(), resp.getOptionalParameters());
+
   }
 
   /* (non-Javadoc)
@@ -529,6 +567,33 @@ public class SMPPSession extends AbstractSession implements ClientSession {
     }
   }
 
+  private SubmitSmResult fireAcceptSubmitSm(SubmitSm submitSm) throws ProcessRequestException {
+    if (messageReceiverListener != null) {
+      return messageReceiverListener.onAcceptSubmitSm(submitSm, this);
+    }
+    log.warn("Received submit_sm but MessageReceiverListener is null, returning SMPP error");
+    throw new ProcessRequestException(NO_MESSAGE_RECEIVER_LISTENER_REGISTERED,
+            SMPPConstant.STAT_ESME_RX_R_APPN);
+  }
+
+  @Override
+  public void deliverShortMessage(String serviceType, TypeOfNumber sourceAddrTon, NumberingPlanIndicator sourceAddrNpi, String sourceAddr, TypeOfNumber destAddrTon, NumberingPlanIndicator destAddrNpi, String destinationAddr, ESMClass esmClass, byte protocolId, byte priorityFlag, RegisteredDelivery registeredDelivery, DataCoding dataCoding, byte[] shortMessage, OptionalParameter... optionalParameters) throws PDUException, ResponseTimeoutException, InvalidResponseException, NegativeResponseException, IOException {
+    ensureReceivable("deliverShortMessage");
+
+    DeliverSmCommandTask task = new DeliverSmCommandTask(pduSender(),
+            serviceType, sourceAddrTon, sourceAddrNpi, sourceAddr,
+            destAddrTon, destAddrNpi, destinationAddr, esmClass, protocolId,
+            priorityFlag, registeredDelivery, dataCoding, shortMessage,
+            optionalParameters);
+
+    executeSendCommand(task, getTransactionTimer());
+  }
+
+  @Override
+  public void alertNotification(TypeOfNumber sourceAddrTon, NumberingPlanIndicator sourceAddrNpi, String sourceAddr, TypeOfNumber esmeAddrTon, NumberingPlanIndicator esmeAddrNpi, String esmeAddr, OptionalParameter... optionalParameters) throws PDUException, ResponseTimeoutException, InvalidResponseException, NegativeResponseException, IOException {
+    throw new UnsupportedOperationException("Not implemented yet");
+  }
+
   private class ResponseHandlerImpl implements ResponseHandler {
 
     @Override
@@ -573,6 +638,28 @@ public class SMPPSession extends AbstractSession implements ClientSession {
         fireAcceptAlertNotification(alertNotification);
       } catch (Exception e) {
         log.error("Invalid runtime exception thrown when processing alert_notification", e);
+      }
+    }
+
+    @Override
+    public SubmitSmResult processSubmitSm(SubmitSm submitSm) throws ProcessRequestException {
+    	try {
+    		return fireAcceptSubmitSm(submitSm);
+	    } catch (ProcessRequestException e) {
+	    	throw e;
+	    } catch (Exception e) {
+	        String msg = "Invalid runtime exception thrown when processing submit_sm";
+	        log.error(msg, e);
+	        throw new ProcessRequestException(msg, SMPPConstant.STAT_ESME_RX_T_APPN);
+	    }
+    }
+
+    @Override
+    public void sendSubmitSmResponse(SubmitSmResult submitSmResult, int sequenceNumber) throws IOException {
+    	try {
+			  pduSender().sendSubmitSmResp(out, sequenceNumber, submitSmResult.getMessageId(), submitSmResult.getOptionalParameters());
+      } catch (PDUStringException | IOException e) {
+        log.error("Failed sending submit_sm_resp", e);
       }
     }
 

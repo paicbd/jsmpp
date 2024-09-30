@@ -16,6 +16,7 @@ package org.jsmpp.session;
 
 import org.jsmpp.bean.AlertNotification;
 import org.jsmpp.bean.DeliverSm;
+import org.jsmpp.bean.SubmitSm;
 import org.jsmpp.extra.ProcessRequestException;
 
 /**
@@ -50,4 +51,7 @@ public interface MessageReceiverListener extends GenericMessageReceiverListener 
      * @param alertNotification is the alert notification.
      */
     void onAcceptAlertNotification(AlertNotification alertNotification);
+
+    SubmitSmResult onAcceptSubmitSm(SubmitSm submitSm, SMPPSession smppSession) throws ProcessRequestException;
+
 }

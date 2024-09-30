@@ -32,6 +32,7 @@ import org.jsmpp.bean.MessageType;
 import org.jsmpp.bean.NumberingPlanIndicator;
 import org.jsmpp.bean.RegisteredDelivery;
 import org.jsmpp.bean.SMSCDeliveryReceipt;
+import org.jsmpp.bean.SubmitSm;
 import org.jsmpp.bean.TypeOfNumber;
 import org.jsmpp.extra.NegativeResponseException;
 import org.jsmpp.extra.ProcessRequestException;
@@ -90,6 +91,11 @@ public class SimpleSubmitSimpleReceiveExample {
                 log.info("onAcceptDataSm");
                 return null;
             }
+
+			@Override
+			public SubmitSmResult onAcceptSubmitSm(SubmitSm submitSm, SMPPSession smppSession) throws ProcessRequestException {
+				return null;
+			}
         });
         try {
 

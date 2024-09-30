@@ -78,6 +78,10 @@ public class PDUProcessTask implements Runnable {
                 activityNotifier.notifyActivity();
                 sessionContext.getStateProcessor().processEnquireLinkResp(pduHeader, pdu, responseHandler);
                 break;
+            case SMPPConstant.CID_SUBMIT_SM:
+                activityNotifier.notifyActivity();
+                sessionContext.getStateProcessor().processSumitSm(pduHeader, pdu, responseHandler);
+                break;
             case SMPPConstant.CID_SUBMIT_SM_RESP:
                 activityNotifier.notifyActivity();
                 sessionContext.getStateProcessor().processSubmitSmResp(pduHeader, pdu, responseHandler);
@@ -93,6 +97,10 @@ public class PDUProcessTask implements Runnable {
             case SMPPConstant.CID_DELIVER_SM:
                 activityNotifier.notifyActivity();
                 sessionContext.getStateProcessor().processDeliverSm(pduHeader, pdu, responseHandler);
+                break;
+            case SMPPConstant.CID_DELIVER_SM_RESP:
+                activityNotifier.notifyActivity();
+                sessionContext.getStateProcessor().processDeliverSmResp(pduHeader, pdu, responseHandler);
                 break;
             case SMPPConstant.CID_DATA_SM:
                 activityNotifier.notifyActivity();

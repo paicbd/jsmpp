@@ -34,6 +34,7 @@ import org.jsmpp.bean.NumberingPlanIndicator;
 import org.jsmpp.bean.OptionalParameter;
 import org.jsmpp.bean.RegisteredDelivery;
 import org.jsmpp.bean.SMSCDeliveryReceipt;
+import org.jsmpp.bean.SubmitSm;
 import org.jsmpp.bean.TypeOfNumber;
 import org.jsmpp.extra.NegativeResponseException;
 import org.jsmpp.extra.ProcessRequestException;
@@ -95,6 +96,13 @@ public class AsyncSubmitReceiveDeliverSmExample {
 
             public void onAcceptAlertNotification(AlertNotification alertNotification) {
                 log.info("Receiving alert_notification");
+            }
+
+            @Override
+            public SubmitSmResult onAcceptSubmitSm(SubmitSm submitSm, SMPPSession smppSession) throws ProcessRequestException {
+            	MessageId messageId = MESSAGE_ID_GENERATOR.newMessageId();
+                log.info("Receiving submit_sm, generated message id {}", messageId.getValue());
+                return new SubmitSmResult(messageId, new OptionalParameter[]{});
             }
 
             public DataSmResult onAcceptDataSm(DataSm dataSm, Session source)

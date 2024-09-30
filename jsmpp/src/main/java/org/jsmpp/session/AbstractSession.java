@@ -309,7 +309,7 @@ public abstract class AbstractSession implements Session, Closeable {
     }
 
     /**
-     * Execute send command command task.
+     * Execute send command task.
      *
      * @param task is the task.
      * @param timeout is the timeout in milliseconds.
@@ -324,40 +324,63 @@ public abstract class AbstractSession implements Session, Closeable {
             throws PDUException, ResponseTimeoutException,
             InvalidResponseException, NegativeResponseException, IOException {
 
-        int seqNum = sequence.nextValue();
+        int sequenceNumber = sequence.nextValue();
+        return this.executeSend(task, timeout, sequenceNumber);
+    }
+
+    /**
+     * Execute send command task.
+     *
+     * @param task is the task.
+     * @param timeout is the timeout in milliseconds.
+     * @param sequenceNumber is the sequenceNumber, use this parameter if you need to avoid the sequence auto-generation (manual mode).
+     * @return the command response.
+     * @throws PDUException if there is invalid PDU parameter found.
+     * @throws ResponseTimeoutException if the response has reach it timeout.
+     * @throws InvalidResponseException if invalid response found.
+     * @throws NegativeResponseException if the negative response found.
+     * @throws IOException if there is an IO error found.
+     */
+    protected Command executeSendCommand(SendCommandTask task, long timeout, int sequenceNumber)
+            throws PDUException, ResponseTimeoutException,
+            InvalidResponseException, NegativeResponseException, IOException {
+        return this.executeSend(task, timeout, sequenceNumber);
+    }
+
+    protected Command executeSend(SendCommandTask task, long timeout, int sequenceNumber)  throws PDUException, ResponseTimeoutException,
+            InvalidResponseException, NegativeResponseException, IOException {
         PendingResponse<Command> pendingResp = new PendingResponse<>(timeout);
-        pendingResponses.put(seqNum, pendingResp);
+        pendingResponses.put(sequenceNumber, pendingResp);
         try {
-            task.executeTask(connection().getOutputStream(), seqNum);
+            task.executeTask(connection().getOutputStream(), sequenceNumber);
         } catch (IOException e) {
             log.error("Sending {} command failed", task.getCommandName(), e);
 
             if(COMMAND_NAME_ENQUIRE_LINK.equals(task.getCommandName())) {
                 log.info("Ignore failure of sending enquire_link, wait to see if connection is restored");
             } else {
-                pendingResponses.remove(seqNum);
+                pendingResponses.remove(sequenceNumber);
                 close();
                 throw e;
             }
         }
-
         try {
             pendingResp.waitDone();
             if(COMMAND_NAME_ENQUIRE_LINK.equals(task.getCommandName())) {
                 if (log.isTraceEnabled()) {
-                    log.trace("{} response with sequence_number {} received for session {}", task.getCommandName(), seqNum, sessionId);
+                    log.trace("{} response with sequence_number {} received for session {}", task.getCommandName(), sequenceNumber, sessionId);
                 }
             } else {
-                log.debug("{} response with sequence_number {} received for session {}", task.getCommandName(), seqNum, sessionId);
+                log.debug("{} response with sequence_number {} received for session {}", task.getCommandName(), sequenceNumber, sessionId);
             }
         } catch (ResponseTimeoutException e) {
-            pendingResponses.remove(seqNum);
+            pendingResponses.remove(sequenceNumber);
             throw new ResponseTimeoutException("No response after waiting for "
                     + timeout + " millis when executing "
                     + task.getCommandName() + " with session " + sessionId
-                    + " and sequence_number " + seqNum, e);
+                    + " and sequence_number " + sequenceNumber, e);
         } catch (InvalidResponseException e) {
-            pendingResponses.remove(seqNum);
+            pendingResponses.remove(sequenceNumber);
             throw e;
         }
 
