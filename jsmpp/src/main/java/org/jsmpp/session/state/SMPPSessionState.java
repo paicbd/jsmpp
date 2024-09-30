@@ -94,6 +94,9 @@ public interface SMPPSessionState extends GenericSMPPSessionState {
     void processDeliverSm(Command pduHeader, byte[] pdu,
             ResponseHandler responseHandler) throws IOException;
 
+    void processDeliverSmResp(Command pduHeader, byte[] pdu,
+                              ResponseHandler responseHandler) throws IOException;
+
     /**
      * Process the cancel short message request command.
      *
@@ -159,4 +162,15 @@ public interface SMPPSessionState extends GenericSMPPSessionState {
      */
     void processQueryBroadcastSmResp(Command pduHeader, byte[] pdu,
                                      ResponseHandler responseHandler) throws IOException;
+
+    /**
+     * Process the submit short message request command.
+     *
+     * @param pduHeader is the PDU header.
+     * @param pdu is the complete PDU.
+     * @param responseHandler is the session handler.
+     * @throws IOException throw if there is an IO error occur.
+     */
+    void processSumitSm(Command pduHeader, byte[] pdu,
+                          ResponseHandler responseHandler) throws IOException;
 }

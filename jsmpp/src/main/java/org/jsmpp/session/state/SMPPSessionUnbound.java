@@ -56,6 +56,11 @@ class SMPPSessionUnbound implements SMPPSessionState {
     }
 
     @Override
+    public void processDeliverSmResp(Command pduHeader, byte[] pdu, ResponseHandler responseHandler) throws IOException {
+        throw new IOException(INVALID_PROCESS_FOR_UNBOUND_SESSION);
+    }
+
+    @Override
     public void processEnquireLink(Command pduHeader, byte[] pdu,
             BaseResponseHandler responseHandler) throws IOException {
         throw new IOException(INVALID_PROCESS_FOR_UNBOUND_SESSION);
@@ -159,4 +164,9 @@ class SMPPSessionUnbound implements SMPPSessionState {
         throws IOException {
         throw new IOException(INVALID_PROCESS_FOR_UNBOUND_SESSION);
     }
+
+	@Override
+	public void processSumitSm(Command pduHeader, byte[] pdu, ResponseHandler responseHandler) throws IOException {
+		throw new IOException(INVALID_PROCESS_FOR_UNBOUND_SESSION);
+	}
 }

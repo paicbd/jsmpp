@@ -132,4 +132,15 @@ class SMPPSessionBoundRX extends SMPPSessionBound implements SMPPSessionState {
                 .getSequenceNumber());
     }
 
+    @Override
+    public void processSumitSm(Command pduHeader, byte[] pdu, ResponseHandler responseHandler) throws IOException {
+        responseHandler.sendNegativeResponse(pduHeader.getCommandId(),
+                SMPPConstant.STAT_ESME_RINVBNDSTS, pduHeader
+                        .getSequenceNumber());
+    }
+
+    @Override
+    public void processDeliverSmResp(Command pduHeader, byte[] pdu, ResponseHandler responseHandler) throws IOException {
+        processDeliverSmResp0(pduHeader, pdu, responseHandler);
+    }
 }

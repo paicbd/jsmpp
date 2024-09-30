@@ -120,6 +120,11 @@ public class TestSmppClient implements Runnable, MessageReceiverListener {
   public void onAcceptAlertNotification(final AlertNotification alertNotification) {
   }
 
+  @Override
+  public SubmitSmResult onAcceptSubmitSm(SubmitSm submitSm, SMPPSession smppSession) throws ProcessRequestException {
+    return null;
+  }
+
   public void increment(String counterName) {
     final AtomicInteger counter = counters.get(counterName);
     if (counter != null) {

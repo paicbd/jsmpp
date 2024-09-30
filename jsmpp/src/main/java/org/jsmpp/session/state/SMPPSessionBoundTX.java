@@ -27,10 +27,13 @@ import org.jsmpp.bean.QueryBroadcastSmResp;
 import org.jsmpp.bean.QuerySmResp;
 import org.jsmpp.bean.ReplaceSmResp;
 import org.jsmpp.bean.SubmitMultiResp;
+import org.jsmpp.bean.SubmitSm;
 import org.jsmpp.bean.SubmitSmResp;
 import org.jsmpp.extra.PendingResponse;
+import org.jsmpp.extra.ProcessRequestException;
 import org.jsmpp.extra.SessionState;
 import org.jsmpp.session.ResponseHandler;
+import org.jsmpp.session.SubmitSmResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,6 +160,11 @@ class SMPPSessionBoundTX extends SMPPSessionBound implements SMPPSessionState {
     }
 
     @Override
+    public void processDeliverSmResp(Command pduHeader, byte[] pdu, ResponseHandler responseHandler) throws IOException {
+        processDeliverSmResp0(pduHeader, pdu, responseHandler);
+    }
+
+    @Override
     public void processAlertNotification(Command pduHeader, byte[] pdu,
             ResponseHandler responseHandler) {
         log.error("Receiving alert_notification while on invalid bound state (transmitter)");
@@ -216,6 +224,21 @@ class SMPPSessionBoundTX extends SMPPSessionBound implements SMPPSessionState {
             }
         } else {
             log.warn(NO_REQUEST_FOR_SEQUENCE_NUMBER_FOUND, pduHeader.getSequenceNumber());
+        }
+    }
+
+    @Override
+    public void processSumitSm(Command pduHeader, byte[] pdu, ResponseHandler responseHandler) throws IOException {        
+        try {
+            SubmitSm submitSm = pduDecomposer.submitSm(pdu);
+            SubmitSmResult submitSmResult = responseHandler.processSubmitSm(submitSm);
+            log.debug("Sending submit_sm_resp with message_id {} for request with sequence_number {}",
+                    submitSmResult.getMessageId(), pduHeader.getSequenceNumber());
+            responseHandler.sendSubmitSmResponse(submitSmResult, pduHeader.getSequenceNumber());
+        } catch (PDUStringException e) {
+            responseHandler.sendNegativeResponse(pduHeader.getCommandId(), e.getErrorCode(), pduHeader.getSequenceNumber());
+        } catch (ProcessRequestException e) {
+            responseHandler.sendNegativeResponse(pduHeader.getCommandId(), e.getErrorCode(), pduHeader.getSequenceNumber());
         }
     }
 

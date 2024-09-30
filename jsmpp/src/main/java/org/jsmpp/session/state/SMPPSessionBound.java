@@ -20,6 +20,8 @@ import org.jsmpp.PDUStringException;
 import org.jsmpp.SMPPConstant;
 import org.jsmpp.bean.Command;
 import org.jsmpp.bean.DeliverSm;
+import org.jsmpp.bean.DeliverSmResp;
+import org.jsmpp.extra.PendingResponse;
 import org.jsmpp.extra.ProcessRequestException;
 import org.jsmpp.session.ResponseHandler;
 import org.jsmpp.session.SMPPSessionContext;
@@ -56,6 +58,17 @@ abstract class SMPPSessionBound extends AbstractGenericSMPPSessionBound implemen
         } catch (ProcessRequestException e) {
             log.error("Failed processing deliver_sm", e);
             responseHandler.sendDeliverSmResp(e.getErrorCode(), pduHeader.getSequenceNumber(), null);
+        }
+    }
+
+    static void processDeliverSmResp0(Command pduHeader, byte[] pdu,
+                                      ResponseHandler responseHandler) {
+        PendingResponse<Command> pendingResp = responseHandler.removeSentItem(pduHeader.getSequenceNumber());
+        if (pendingResp != null) {
+            DeliverSmResp resp = pduDecomposer.deliverSmResp(pdu);
+            pendingResp.done(resp);
+        } else {
+            log.warn("No request with sequence_number {} found", pduHeader.getSequenceNumber());
         }
     }
 }

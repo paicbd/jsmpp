@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 class SMPPSessionOpen implements SMPPSessionState {
     private static final Logger log = LoggerFactory.getLogger(SMPPSessionOpen.class);
     private static final PDUDecomposer pduDecomposer = new DefaultDecomposer();
+    private static final String INVALID_PROCESS_FOR_OPEN_SESSION = "Invalid process for open session state";
 
     @Override
     public SessionState getSessionState() {
@@ -98,6 +99,14 @@ class SMPPSessionOpen implements SMPPSessionState {
         responseHandler.sendNegativeResponse(pduHeader.getCommandId(),
             SMPPConstant.STAT_ESME_RINVBNDSTS, pduHeader
                 .getSequenceNumber());
+    }
+
+    @Override
+    public void processDeliverSmResp(Command pduHeader, byte[] pdu, ResponseHandler responseHandler) throws IOException {
+        log.info("Received deliver_sm_response in OPEN state, send negative response");
+        responseHandler.sendNegativeResponse(pduHeader.getCommandId(),
+                SMPPConstant.STAT_ESME_RINVBNDSTS, pduHeader
+                        .getSequenceNumber());
     }
 
     @Override
@@ -286,5 +295,10 @@ class SMPPSessionOpen implements SMPPSessionState {
                 "Receive unexpected query_broadcast_sm_resp"));
         }
     }
+
+	@Override
+	public void processSumitSm(Command pduHeader, byte[] pdu, ResponseHandler responseHandler) throws IOException {
+		throw new IOException(INVALID_PROCESS_FOR_OPEN_SESSION);
+	}
 
 }

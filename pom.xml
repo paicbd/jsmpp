@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.jsmpp</groupId>
     <artifactId>jsmpp-pom</artifactId>
-    <version>3.0.1</version>
+    <version>3.1.5</version>
     <packaging>pom</packaging>
 
     <name>jSMPP - Parent</name>
@@ -39,6 +40,27 @@
         <developer>
             <name>Pim Moerenhout</name>
             <email>pim.moerenhout@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Enmanuel Calero</name>
+            <email>enmanuel.calero@paicbd.com</email>
+            <organization>PAiC BD</organization>
+            <organizationUrl>https://paic-bd.com/</organizationUrl>
+            <timezone>-6</timezone>
+        </developer>
+        <developer>
+            <name>Melvin Mendoza</name>
+            <email>melvin.mendoza@paicbd.com</email>
+            <organization>PAiC BD</organization>
+            <organizationUrl>https://paic-bd.com/</organizationUrl>
+            <timezone>-6</timezone>
+        </developer>
+        <developer>
+            <name>Jose Aguirre</name>
+            <email>jose.aguirre@paicbd.com</email>
+            <organization>PAiC BD</organization>
+            <organizationUrl>https://paic-bd.com/</organizationUrl>
+            <timezone>-6</timezone>
         </developer>
     </developers>
 
@@ -146,9 +168,9 @@
                     <version>${maven-release-plugin.version}</version>
                 </plugin>
                 <plugin>
-                  <groupId>org.apache.felix</groupId>
-                  <artifactId>maven-bundle-plugin</artifactId>
-                  <version>${maven-bundle-plugin.version}</version>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>${maven-bundle-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
@@ -218,7 +240,8 @@
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>
                             <manifestEntries>
-                                <Implementation-Version>${project.version}-${git.branch}.${git.commit.id.abbrev}</Implementation-Version>
+                                <Implementation-Version>${project.version}-${git.branch}.${git.commit.id.abbrev}
+                                </Implementation-Version>
                                 <Dependencies>org.apache.log4j</Dependencies>
                             </manifestEntries>
                         </archive>

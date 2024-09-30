@@ -34,7 +34,7 @@ public class DefaultDeliveryReceiptStripper implements DeliveryReceiptStrip<Deli
 
     @Override
     public DeliveryReceipt strip(DeliverSm deliverSm) throws InvalidDeliveryReceiptException {
-        if (MessageType.SMSC_DEL_RECEIPT.containedIn(deliverSm.getEsmClass())) {
+        if (MessageType.SMSC_DEL_RECEIPT.containedIn(deliverSm.getEsmClass()) || MessageType.DEFAULT.containedIn(deliverSm.getEsmClass())) {
             return DefaultDecomposer.getInstance().deliveryReceipt(deliverSm.getShortMessage());
         } else {
             throw new InvalidDeliveryReceiptException("deliver_sm is not a delivery receipt since esm_class value = " + deliverSm.getEsmClass());

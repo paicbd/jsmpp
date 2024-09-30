@@ -33,12 +33,14 @@ public class ComposerDecomposerReaderTest {
     @Test(groups="checkintest")
     public void lowLevel() {
         byte[] b = null;
-        String systemId = "smsc";
+        String systemId = "smsc123456789123456";
+        String password = "123456789123456";
         
         PDUByteBuffer buf = new PDUByteBuffer(BindType.BIND_TRX.responseCommandId(), 0, 1);
         buf.append(systemId);
+        buf.append(password);
         b = buf.toBytes();
-        assertEquals(b.length, 16 + systemId.length() + 1);
+        assertEquals(b.length, 16 + systemId.length() + 1 + password.length() + 1);
         printLog("Length of bytes : " + b.length);
         
         
@@ -67,6 +69,8 @@ public class ComposerDecomposerReaderTest {
         
         String readedSystemId = reader.readCString();
         assertEquals(readedSystemId, systemId);
+        String readedPassword = reader.readCString();
+        assertEquals(readedPassword, password);
     }
     
     @Test(groups="checkintest")
