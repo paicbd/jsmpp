@@ -111,11 +111,9 @@ public class DefaultDecomposer implements PDUDecomposer {
         SequentialBytesReader reader = new SequentialBytesReader(b);
         assignHeader(req, reader);
         req.setSystemId(reader.readCString());
-        StringValidator.validateString(req.getSystemId(),
-                StringParameter.SYSTEM_ID);
+        //StringValidator.validateString(req.getSystemId(), StringParameter.SYSTEM_ID);
         req.setPassword(reader.readCString());
-        StringValidator.validateString(req.getPassword(),
-                StringParameter.PASSWORD);
+        //StringValidator.validateString(req.getPassword(), StringParameter.PASSWORD);
         req.setSystemType(reader.readCString());
         StringValidator.validateString(req.getSystemType(),
                 StringParameter.SYSTEM_TYPE);
@@ -140,8 +138,7 @@ public class DefaultDecomposer implements PDUDecomposer {
         assignHeader(resp, reader);
         if (resp.getCommandLength() > PDU_HEADER_LENGTH) {
             resp.setSystemId(reader.readCString());
-            StringValidator.validateString(resp.getSystemId(),
-                    StringParameter.SYSTEM_ID);
+            //StringValidator.validateString(resp.getSystemId(), StringParameter.SYSTEM_ID);
 
             resp.setOptionalParameters(readOptionalParameters(reader));
         }
@@ -183,11 +180,9 @@ public class DefaultDecomposer implements PDUDecomposer {
         SequentialBytesReader reader = new SequentialBytesReader(b);
         assignHeader(req, reader);
         req.setSystemId(reader.readCString());
-        StringValidator.validateString(req.getSystemId(),
-                StringParameter.SYSTEM_ID);
+        //StringValidator.validateString(req.getSystemId(), StringParameter.SYSTEM_ID);
         req.setPassword(reader.readCString());
-        StringValidator.validateString(req.getPassword(),
-                StringParameter.PASSWORD);
+        //StringValidator.validateString(req.getPassword(), StringParameter.PASSWORD);
         return req;
     }
 

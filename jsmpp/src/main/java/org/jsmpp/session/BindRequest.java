@@ -132,7 +132,7 @@ public class BindRequest {
      * @see #reject(int errorCode)
      */
     public void accept(String systemId, InterfaceVersion interfaceVersion) throws PDUStringException, IllegalStateException, IOException {
-        StringValidator.validateString(systemId, StringParameter.SYSTEM_ID);
+        //StringValidator.validateString(systemId, StringParameter.SYSTEM_ID);
         lock.lock();
         try {
             if (!done) {

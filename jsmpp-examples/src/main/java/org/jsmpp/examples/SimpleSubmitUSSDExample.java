@@ -33,6 +33,7 @@ import org.jsmpp.bean.NumberingPlanIndicator;
 import org.jsmpp.bean.OptionalParameter;
 import org.jsmpp.bean.RegisteredDelivery;
 import org.jsmpp.bean.SMSCDeliveryReceipt;
+import org.jsmpp.bean.SubmitSm;
 import org.jsmpp.bean.TypeOfNumber;
 import org.jsmpp.extra.NegativeResponseException;
 import org.jsmpp.extra.ProcessRequestException;
@@ -44,6 +45,7 @@ import org.jsmpp.session.SMPPSession;
 import org.jsmpp.session.Session;
 import org.jsmpp.session.SubmitSmResult;
 import org.jsmpp.util.MessageIDGenerator;
+import org.jsmpp.util.MessageId;
 import org.jsmpp.util.RandomMessageIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +109,12 @@ public class SimpleSubmitUSSDExample {
         log.info("Received data_sm");
         return new DataSmResult(MESSAGE_ID_GENERATOR.newMessageId(), new OptionalParameter[]{});
       }
+
+	@Override
+	public SubmitSmResult onAcceptSubmitSm(SubmitSm submitSm, SMPPSession smppSession) throws ProcessRequestException {
+		MessageId messageId = MESSAGE_ID_GENERATOR.newMessageId();
+    return new SubmitSmResult(messageId, new OptionalParameter[0]);
+	}
     });
 
     try {
